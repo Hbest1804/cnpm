@@ -1,4 +1,18 @@
 <template>
+  <div>
+    <!-- Navigation Menu -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a href="/" class="navbar-brand">Trang chủ</a>
+        <ul class="navbar-links">
+          <li><a href="/cart" class="nav-item">Giỏ hàng</a></li>
+          <li><a href="/products" class="nav-item">Sản phẩm</a></li>
+         
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Cart Page -->
     <div class="cart-page">
       <h1>Giỏ hàng của bạn</h1>
       <div v-for="item in cartItems" :key="item.id" class="cart-item">
@@ -6,16 +20,14 @@
         <div>
           <h2>{{ item.name }}</h2>
           <p>Giá: {{ item.price }}đ</p>
-          <input type="number" v-model="item.quantity" min="1" />
+          <p>Thời gian: {{ getCurrentTime() }}</p>
+          <input type="number" v-model="item.quantity" @change="updateQuantity(item)" min="1" />
           <button @click="removeItem(item.id)">Xóa</button>
         </div>
       </div>
-      
       <div class="total">
         <p>Tổng cộng: {{ totalPrice }}đ</p>
       </div>
-  
-      <!-- Phần Thanh Toán -->
       <div class="checkout-section">
         <h2>Thông tin thanh toán</h2>
         <form @submit.prevent="processCheckout">
@@ -38,44 +50,141 @@
         </form>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        cartItems: [], // Load cart items từ Vuex hoặc localStorage
-        checkoutInfo: {
-          name: '',
-          address: '',
-          paymentMethod: 'credit',
-        },
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      cartItems: [],
+      checkoutInfo: {
+        name: '',
+        address: '',
+        paymentMethod: '',
+      },
+    };
+  },
+  computed: {
+    totalPrice() {
+      return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    },
+  },
+  methods: {
+    async loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      this.cartItems = cart;
+    },
+    async updateQuantity(item) {
+      const index = this.cartItems.findIndex((cartItem) => cartItem.id === item.id);
+      if (index !== -1) {
+        this.cartItems[index].quantity = item.quantity;
+      }
+      localStorage.setItem('cart', JSON.stringify(this.cartItems));
+      await this.updateCartServer(this.cartItems);
+    },
+    async removeItem(id) {
+      this.cartItems = this.cartItems.filter((item) => item.id !== id);
+      localStorage.setItem('cart', JSON.stringify(this.cartItems));
+      await this.updateCartServer(this.cartItems);
+    },
+    async updateCartServer(cart) {
+      try {
+        await fetch('http://localhost:3000/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cart),
+        });
+      } catch (error) {
+        console.error('Lỗi cập nhật giỏ hàng:', error);
+      }
+    },
+    getCurrentTime() {
+      const now = new Date();
+      return now.toLocaleString('vi-VN', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    },
+    async processCheckout() {
+      const checkoutData = {
+        invoiceDate: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        total: this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+        status: 'Đã thanh toán',
+        items: this.cartItems,
       };
+
+      try {
+        const response = await fetch('http://localhost:3000/api/invoices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(checkoutData),
+        });
+
+        if (response.ok) {
+          localStorage.setItem('checkoutInfo', JSON.stringify(checkoutData));
+          alert('Thanh toán thành công! Cảm ơn bạn đã mua hàng.');
+          localStorage.removeItem('cart');
+          this.cartItems = [];
+          this.$router.push({ name: 'invoice' });
+        } else {
+          alert('Lỗi');
+        }
+      } catch (error) {
+        console.error('Lỗi kết nối server:', error);
+        alert('Lỗi khi thanh toán. Vui lòng thử lại.');
+      }
     },
-    computed: {
-      totalPrice() {
-        return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-      },
-    },
-    methods: {
-      removeItem(id) {
-        this.cartItems = this.cartItems.filter(item => item.id !== id);
-      },
-      processCheckout() {
-        // Xử lý thanh toán tại đây, ví dụ: gửi dữ liệu đến API backend
-        alert('Thanh toán thành công! Cảm ơn bạn đã mua hàng.');
-        // Xóa giỏ hàng sau khi thanh toán thành công
-        this.cartItems = [];
-      },
-    },
-    mounted() {
-      // Tải giỏ hàng từ Vuex hoặc localStorage
-    },
-  };
-  </script>
-  
-  <style>
-  .cart-page {
+  },
+  mounted() {
+    this.loadCart();
+  },
+};
+</script>
+
+<style>
+/* Menu Styles */
+.navbar {
+  background-color: #333;
+  padding: 10px 20px;
+  color: white;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-size: 20px;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-item {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.nav-item:hover {
+  text-decoration: underline;
+}
+
+.cart-page {
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
@@ -84,6 +193,7 @@
   box-shadow: 0 4px 10px rgba(18, 209, 56, 0.868);
 }
 
+/* Existing styles for the cart page */
 h1 {
   font-size: 24px;
   font-weight: bold;
@@ -199,6 +309,4 @@ h1 {
 .checkout-section button[type="submit"]:hover {
   background-color: #e33b3f;
 }
-
-  </style>
-  
+</style>

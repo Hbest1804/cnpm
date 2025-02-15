@@ -16,12 +16,17 @@
       </div>
       <button type="submit">Đăng ký</button>
       <p v-if="errorMessage" class="message">{{ errorMessage }}</p>
+
+      <div class="logo-container">
+        <img src="@/img/z.png" alt="Logo" class="logo" />
+      </div>
     </form>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -40,9 +45,15 @@ export default {
           password: this.password,
           email: this.email
         });
-        alert(response.data.message); // Show success message
+        alert(response.data.message); 
+        this.$router.push('/login');// Show success message
       } catch (error) {
-        alert('Lỗi đăng ký: ' + error.response.data.message);
+        console.error(error); // Log error to console for debugging
+        if (error.response) {
+          this.errorMessage = error.response.data.message || 'Lỗi đăng ký không xác định';
+        } else {
+          this.errorMessage = 'Lỗi kết nối hoặc không thể xử lý yêu cầu đăng ký.';
+        }
       }
     }
   }
@@ -50,9 +61,10 @@ export default {
 </script>
 
 <style scoped>
+/* CSS styles for the signup page */
 body {
-  background-color: #1a1a1a; /* Dark background */
-  color: #e0e0e0; /* Light text color for readability */
+  background-color: #1a1a1a;
+  color: #e0e0e0;
   font-family: Arial, sans-serif;
   display: flex;
   align-items: center;
@@ -63,12 +75,18 @@ body {
 
 .signup {
   text-align: center;
+  background-image: url('https://cellphones.com.vn/sforum/wp-content/uploads/2024/04/anh-bia-facebook-3.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  justify-content: flex-start;
 }
 
 h2 {
   font-size: 28px;
   margin-bottom: 20px;
-  color: #4caf50; /* Green color for the header */
+  color: #4caf50;
 }
 
 form {
@@ -101,7 +119,7 @@ form {
 }
 
 .form-group input:focus {
-  border-color: #4caf50; /* Green border on focus */
+  border-color: #4caf50;
   outline: none;
 }
 
@@ -112,7 +130,7 @@ form {
 button {
   width: 100%;
   padding: 15px;
-  background-color: #0f5add; /* Primary button color */
+  background-color: #0f5add;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -122,14 +140,24 @@ button {
 }
 
 button:hover {
-  background-color: #388e3c; /* Darker green on hover */
+  background-color: #388e3c;
 }
 
 .message {
-  color: #e53935; /* Red color for error messages */
+  color: #e53935;
   font-size: 16px;
   margin-top: 10px;
 }
 
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
 
+.logo {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+}
 </style>
