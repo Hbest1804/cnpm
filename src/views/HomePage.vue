@@ -1,13 +1,13 @@
 <template>
   <div>
-    <!-- Thanh thông tin trên cùng -->
+  
     <div class="top-bar">
       <div>🚚 Giao nhanh - Miễn phí cho đơn từ 300K</div>
       <div><a href="#">Sản phẩm Chính hãng - Xuất VAT đầy đủ</a></div>
       <div><a href="#">Thu cũ Giá ngon - Lên đời tiết kiệm</a></div>
     </div>
 
-    <!-- Header chính -->
+   
     <header class="main-header">
       <div class="nav-container">
         <div class="logo">

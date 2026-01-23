@@ -17,8 +17,8 @@ app.use(express.json());
 const db = mysql.createConnection({
   host: 'localhost', // Địa chỉ MySQL server
   user: 'root', // Tên người dùng MySQL
-  password: '', // Mật khẩu MySQL (có thể để trống nếu không có mật khẩu cho tài khoản root)
-  database: 'cnpm' // Tên cơ sở dữ liệu của bạn
+  password: '18004huyhio', // Mật khẩu MySQL (có thể để trống nếu không có mật khẩu cho tài khoản root)
+  database: 'ze' // Tên cơ sở dữ liệu của bạn
 });
 
 // Kết nối với cơ sở dữ liệu MySQL
