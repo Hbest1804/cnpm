@@ -1,4 +1,4 @@
-name: Gemini PR Reviewer
+name: Gemini Reviewer
 
 on:
   pull_request:
@@ -12,16 +12,14 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Gemini Code Review
-        # Sử dụng Action này thay vì cái cũ bị lỗi
-        uses: harper-reilly/gemini-review-action@v1.0.3 
+      - name: Gemini Review
+        # Dùng bản này để không bị lỗi "repository not found" nữa
+        uses: stwise/gemini-review-action@v0.1.2
         with:
           api_key: ${{ secrets.GEMINI_API_KEY }}
           model: "gemini-1.5-flash"
-          instructions: |
-            Bạn là một Senior Developer. 
-            Hãy review code trong Pull Request này bằng tiếng Việt.
-            Tập trung vào lỗi logic, bảo mật và hiệu năng.
+          instructions: "Hãy review code bằng tiếng Việt. Tập trung vào lỗi logic và bảo mật."
+          
