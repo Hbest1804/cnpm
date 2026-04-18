@@ -16,15 +16,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Gemini Code Review
-        # Đây là Action cực kỳ ổn định, không bao giờ lỗi "Repository not found"
-        uses: coderabbitai/ai-pr-reviewer@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        # Thay đổi dòng này thành bản chuẩn của cộng đồng:
+        uses: harper-reilly/gemini-review-action@v1.0.3 
         with:
-          debug: false
-          # Bạn có thể yêu cầu review bằng tiếng Việt ở đây
-          system_message: |
-            Bạn là một chuyên gia Senior Developer. 
-            Hãy review các thay đổi trong PR này bằng tiếng Việt. 
-            Tập trung vào lỗi logic và bảo mật.
+          api_key: ${{ secrets.GEMINI_API_KEY }}
+          model: "gemini-1.5-flash"
+          instructions: "Review code bằng tiếng Việt. Tập trung vào lỗi logic và bảo mật."
