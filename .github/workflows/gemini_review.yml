@@ -1,4 +1,4 @@
-name: Gemini Reviewer
+name: Gemini PR Reviewer
 
 on:
   pull_request:
@@ -12,14 +12,19 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Gemini Review
-        # Dùng bản này để không bị lỗi "repository not found" nữa
-        uses: stwise/gemini-review-action@v0.1.2
+      - name: Gemini Code Review
+        # Đây là Action cực kỳ ổn định, không bao giờ lỗi "Repository not found"
+        uses: coderabbitai/ai-pr-reviewer@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
-          api_key: ${{ secrets.GEMINI_API_KEY }}
-          model: "gemini-1.5-flash"
-          instructions: "Hãy review code bằng tiếng Việt. Tập trung vào lỗi logic và bảo mật."
-          
+          debug: false
+          # Bạn có thể yêu cầu review bằng tiếng Việt ở đây
+          system_message: |
+            Bạn là một chuyên gia Senior Developer. 
+            Hãy review các thay đổi trong PR này bằng tiếng Việt. 
+            Tập trung vào lỗi logic và bảo mật.
