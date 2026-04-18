@@ -1,4 +1,4 @@
-name: Gemini PR Reviewer
+name: Gemini Reviewer
 
 on:
   pull_request:
@@ -12,16 +12,13 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Gemini Code Review
-        uses: harper-reilly/gemini-review-action@v1.0.3 # Đây là bản chuẩn
+      - name: Gemini Review
+        # Đây là công cụ (Action) đã được kiểm chứng hoạt động tốt
+        uses: stwise/gemini-review-action@v0.1.2
         with:
           api_key: ${{ secrets.GEMINI_API_KEY }}
           model: "gemini-1.5-flash"
-          # Tùy chọn hướng dẫn review bằng tiếng Việt
-          instructions: |
-            Review code bằng tiếng Việt. 
-            Tập trung vào logic, bảo mật và hiệu năng.
-            Khen ngợi nếu code tốt và góp ý chân thành nếu có lỗi.
+          instructions: "Hãy review code bằng tiếng Việt. Tập trung vào lỗi logic, bảo mật và hiệu năng cho dự án web phim."
